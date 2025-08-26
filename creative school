@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EdTech Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #F0F4F8;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        body.dark-mode {
+            background: #1A1D2D;
+            color: #E0E0E0;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            height: 60px;
+            position: fixed;
+            width: 100%;
+            z-index: 10;
+            transition: background 0.3s;
+        }
+
+        body.dark-mode header {
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .logo {
+            font-weight: bold;
+            color: #4A90E2;
+        }
+
+        body.dark-mode .logo {
+            color: #5AB2FF;
+        }
+
+        .progress-container {
+            width: 50%;
+            height: 8px;
+            background: #F0F4F8;
+            border-radius: 4px;
+            overflow: hidden;
+            transition: background 0.3s;
+        }
+
+        body.dark-mode .progress-container {
+            background: #333;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #4A90E2 45%, #F0F4F8 45%, #F0F4F8 75%, #7D5FFF 75%);
+            transition: width 0.5s;
+        }
+
+        body.dark-mode .progress-bar {
+            background: linear-gradient(to right, #5AB2FF 45%, #333 45%, #333 75%, #A28FFF 75%);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ccc;
+            margin-right: 10px;
+        }
+
+        .dark-toggle {
+            cursor: pointer;
+            font-size: 24px;
+            color: #333;
+        }
+
+        body.dark-mode .dark-toggle {
+            color: #E0E0E0;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        #knowledge-map {
+            width: 80%;
+            height: 80%;
+            max-width: 1200px;
+            max-height: 600px;
+            transition: fill 0.3s, stroke 0.3s;
+        }
+
+        .node {
+            fill: #fff;
+            stroke: #4A90E2;
+            stroke-width: 2;
+            transition: fill 0.3s, stroke 0.3s;
+        }
+
+        body.dark-mode .node {
+            fill: #333;
+            stroke: #5AB2FF;
+        }
+
+        .progress-circle {
+            fill: none;
+            stroke: #4A90E2;
+            stroke-width: 4;
+            stroke-dasharray: 314;
+            transition: stroke-dashoffset 0.5s, stroke 0.3s;
+        }
+
+        body.dark-mode .progress-circle {
+            stroke: #5AB2FF;
+        }
+
+        .line {
+            stroke: #4A90E2;
+            stroke-width: 2;
+            transition: stroke 0.3s;
+        }
+
+        body.dark-mode .line {
+            stroke: #5AB2FF;
+        }
+
+        .text {
+            fill: #333;
+            font-size: 12px;
+            text-anchor: middle;
+            dominant-baseline: central;
+            transition: fill 0.3s;
+        }
+
+        body.dark-mode .text {
+            fill: #E0E0E0;
+        }
+
+        .bottom-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #fff;
+            border-radius: 20px;
+            padding: 5px;
+            display: flex;
+            transition: background 0.3s;
+        }
+
+        body.dark-mode .bottom-toggle {
+            background: #333;
+        }
+
+        .toggle-btn {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .toggle-btn.active {
+            background: #4A90E2;
+            color: #fff;
+        }
+
+        body.dark-mode .toggle-btn.active {
+            background: #5AB2FF;
+        }
+
+        @media (max-width: 1024px) {
+            #knowledge-map {
+                width: 100%;
+                height: 70%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">EdTech Hub</div>
+        <div class="progress-container">
+            <div class="progress-bar" style="width: 75%;"></div> <!-- Example: Maths 45%, Physics 30% total 75% -->
+        </div>
+        <div class="user-profile">
+            <div class="avatar"></div>
+            <div class="dark-toggle" onclick="toggleDarkMode()">☀️</div>
+        </div>
+    </header>
+    <main>
+        <div id="particles-js"></div>
+        <svg id="knowledge-map" viewBox="0 0 1200 600"></svg>
+    </main>
+    <div class="bottom-toggle">
+        <div class="toggle-btn active" onclick="switchSubject('Maths')">Maths</div>
+        <div class="toggle-btn" onclick="switchSubject('Physics')">Physics</div>
+    </div>
+
+    <script>
+        // Particles.js Initialization
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 20, density: { enable: true, value_area: 800 } },
+                color: { value: '#4A90E2' },
+                shape: { type: 'circle' },
+                opacity: { value: 0.5, random: false },
+                size: { value: 5, random: true },
+                line_linked: { enable: false },
+                move: { enable: true, speed: 2, direction: 'none', random: false, straight: false, out_mode: 'out', bounce: false }
+            },
+            interactivity: { detect_on: 'canvas', events: { onhover: { enable: true, mode: 'repulse' }, resize: true } },
+            retina_detect: true
+        });
+
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const toggle = document.querySelector('.dark-toggle');
+            toggle.textContent = document.body.classList.contains('dark-mode') ? '🌙' : '☀️';
+        }
+
+        // Subject Data
+        const subjects = {
+            Maths: {
+                root: { name: 'Maths', progress: 45, x: 600, y: 50 },
+                branches: [
+                    // Level 2
+                    { name: 'Geometry', progress: 60, x: 300, y: 150, parent: 'Maths' },
+                    { name: 'Algebra', progress: 40, x: 600, y: 150, parent: 'Maths' },
+                    { name: 'Arithmetic', progress: 50, x: 900, y: 150, parent: 'Maths' },
+                    // Level 3 (example sub-fields)
+                    { name: 'Euclidean', progress: 70, x: 200, y: 250, parent: 'Geometry' },
+                    { name: 'Coordinate', progress: 55, x: 400, y: 250, parent: 'Geometry' },
+                    // Merging example at Level 4
+                    { name: 'Trigonometry', progress: 30, x: 600, y: 350, parents: ['Algebra', 'Arithmetic', 'Geometry'] }
+                ]
+            },
+            Physics: {
+                root: { name: 'Physics', progress: 30, x: 600, y: 50 },
+                branches: [
+                    { name: 'Mechanics', progress: 50, x: 300, y: 150, parent: 'Physics' },
+                    { name: 'Thermodynamics', progress: 20, x: 600, y: 150, parent: 'Physics' },
+                    { name: 'Electromagnetism', progress: 40, x: 900, y: 150, parent: 'Physics' }
+                ]
+            }
+        };
+
+        let currentSubject = 'Maths';
+
+        function drawTree() {
+            const svg = document.getElementById('knowledge-map');
+            svg.innerHTML = '';
+
+            const data = subjects[currentSubject];
+            const allNodes = [data.root, ...data.branches];
+
+            // Draw lines
+            data.branches.forEach(branch => {
+                if (branch.parent) {
+                    const parent = allNodes.find(n => n.name === branch.parent);
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', parent.x);
+                    line.setAttribute('y1', parent.y);
+                    line.setAttribute('x2', branch.x);
+                    line.setAttribute('y2', branch.y);
+                    line.classList.add('line');
+                    svg.appendChild(line);
+                } else if (branch.parents) {
+                    branch.parents.forEach(p => {
+                        const parent = allNodes.find(n => n.name === p);
+                        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        line.setAttribute('x1', parent.x);
+                        line.setAttribute('y1', parent.y);
+                        line.setAttribute('x2', branch.x);
+                        line.setAttribute('y2', branch.y);
+                        line.classList.add('line');
+                        svg.appendChild(line);
+                    });
+                }
+            });
+
+            // Draw nodes
+            allNodes.forEach(node => {
+                const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', node.x);
+                circle.setAttribute('cy', node.y);
+                circle.setAttribute('r', 40);
+                circle.classList.add('node');
+
+                const progress = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                progress.setAttribute('cx', node.x);
+                progress.setAttribute('cy', node.y);
+                progress.setAttribute('r', 40);
+                progress.classList.add('progress-circle');
+                progress.setAttribute('stroke-dashoffset', 314 - (314 * (node.progress / 100)));
+
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', node.x);
+                text.setAttribute('y', node.y);
+                text.classList.add('text');
+                text.textContent = node.name;
+
+                g.appendChild(circle);
+                g.appendChild(progress);
+                g.appendChild(text);
+                svg.appendChild(g);
+            });
+        }
+
+        function switchSubject(subject) {
+            currentSubject = subject;
+            document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            drawTree();
+        }
+
+        // Initial Draw
+        drawTree();
+    </script>
+</body>
+</html>
